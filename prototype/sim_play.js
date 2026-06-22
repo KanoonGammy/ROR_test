@@ -10,9 +10,10 @@ function colorB(cols){const c={};cols.forEach(x=>c[x]=(c[x]||0)+1);const m=Math.
 function score(d){return d.reduce((a,x)=>a+x.n,0)+poker(d.map(x=>x.n))+colorB(d.map(x=>x.c));}
 const r5=x=>Math.round(x/5)*5;const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 /* ----- ค่า sync กับเกม ----- */
-const genHP=L=>16+L*4,eliteHP=L=>Math.round((16+L*4)*1.45),bossHP=L=>Math.round((16+L*4)*2.0);
-const intentOf=(k,L)=>Math.round((3+L*0.7)*(k==="B"?1.35:k==="E"?1.2:1));   // gen 3+0.7L · elite ×1.2 · boss ×1.35
-const armorOf=(k,L)=>Math.floor(L*(k==="B"?0.25:k==="E"?0.15:0.08));        // #1 เกราะมอน
+const baseHP=L=>16+L*4+Math.round(0.7*L*L);   // HP โตทวีคูณ ต้นง่ายปลายอึด
+const genHP=L=>baseHP(L),eliteHP=L=>Math.round(baseHP(L)*1.45),bossHP=L=>Math.round(baseHP(L)*2.0);
+const intentOf=(k,L)=>Math.round((3+L*0.62)*(k==="B"?1.45:k==="E"?1.25:1));   // gen 3+0.62L · elite ×1.25 · boss ×1.45
+const armorOf=(k,L)=>Math.floor(L*(k==="B"?0.5:k==="E"?0.25:0.1));            // เกราะมอน (ปลายเยอะ)
 const refDmg=[0,10,13,17,23,30],xpNeed=lv=>4+lv*3,tierSpd={G:4,E:7,B:6};
 const GB=4,ES=3,LH=10;                                  // graceBuf, estep, levelup heal
 const GEARG=0.25,GEARE=0.45;                            // ดรอป gear: ทั่วไป 25% · elite 45% · boss 100%
