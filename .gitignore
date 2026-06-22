@@ -1,0 +1,23 @@
+# ===== ไฟล์ลับ/เครื่องมือพัฒนาของ Claude (ไม่อัพขึ้น GitHub) =====
+CLAUDE.md
+.claude/
+
+# ===== โฟลเดอร์ใหญ่ที่ไม่อัพ (ตามที่กำหนด) =====
+GRF_Program/
+
+# ===== Binary / ไฟล์ชั่วคราว / ข้อมูล playtest =====
+prototype/cloudflared.exe
+prototype/cloudflared.log
+prototype/feedback.txt
+__pycache__/
+**/__pycache__/
+
+# ===== เพลงมีลิขสิทธิ์ (วางเองในเครื่อง ไม่ขึ้น public repo) =====
+08.mp3
+prototype/08.mp3
+
+# ===== ขยะระบบ =====
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp

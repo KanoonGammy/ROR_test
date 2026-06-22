@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Realm of Rolls — Combat Prototype (Phase 0)</title>
+<style>
+  :root{
+    --ink:#2b2b2b; --paper:#fbf7ec; --line:#cfd8e6;
+    --accent:#1f6feb; --good:#2e9e57; --warn:#d98a00; --red:#e2483c;
+    --c0:#e2483c; --c1:#2f8fd6; --c2:#2e9e57; --c3:#f0b400; --c4:#7d4fd0; --c5:#e07b39;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; height:100%;}
+  body{
+    font-family:"Comic Sans MS","Patrick Hand",system-ui,sans-serif; color:var(--ink);
+    background:var(--paper); background-image:linear-gradient(var(--line) 1px,transparent 1px);
+    background-size:100% 28px; display:flex; justify-content:center;
+  }
+  .wrap{width:100%; max-width:480px; padding:8px 12px 24px;}
+  h1{font-size:17px; margin:4px 0 0; text-align:center;}
+  .sub{font-size:10px; text-align:center; color:#999; margin-bottom:6px;}
+  .panel{border:2px solid var(--ink); border-radius:10px; background:#fffdf6; box-shadow:2px 2px 0 rgba(0,0,0,.12);}
+
+  .pbar{padding:6px 10px; margin-bottom:4px; display:flex; align-items:center; gap:8px;}
+  .pbar .lbl{font-size:12px; white-space:nowrap;} .pbar .val{font-size:15px; font-weight:bold;}
+  .hpbar{flex:1; height:12px; border:2px solid var(--ink); border-radius:7px; overflow:hidden; background:#eee;}
+  .hpfill{height:100%; transition:width .25s;}
+  .equip{font-size:11px; color:#555; margin:0 0 6px; padding:0 4px; min-height:14px;}
+
+  .stage{padding:8px 10px 10px; margin-bottom:8px; text-align:center; position:relative; overflow:hidden;}
+  .mhead{display:flex; justify-content:center; align-items:center; gap:6px; font-size:13px; font-weight:bold;}
+  .badge{font-size:10px; font-weight:bold; padding:1px 7px; border-radius:8px; border:2px solid var(--ink); color:#fff;}
+  .b-General{background:#7a8597;} .b-Elite{background:var(--accent);} .b-Boss{background:linear-gradient(90deg,#d4380d,#f0a000);}
+  .sprite{font-size:54px; line-height:1.1; margin:2px 0; display:inline-block;}
+  .sprite.hit{animation:shake .32s;}
+  @keyframes shake{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-5deg)}40%{transform:translateX(6px) rotate(4deg)}60%{transform:translateX(-5px) rotate(-3deg)}80%{transform:translateX(3px) rotate(2deg)}}
+  .mtrack{height:18px; border:2px solid var(--ink); border-radius:9px; overflow:hidden; background:#3a2b2b; position:relative; margin-top:3px;}
+  .mghost{position:absolute; left:0; top:0; height:100%; background:#ffe08a; width:100%; transition:width .55s ease .22s;}
+  .mfill{position:absolute; left:0; top:0; height:100%; background:linear-gradient(90deg,#ff5a4d,#c01000); width:100%; transition:width .16s ease;}
+  .mhptxt{position:absolute; width:100%; text-align:center; font-size:11px; font-weight:bold; color:#fff; text-shadow:0 1px 2px #000; line-height:18px; z-index:3;}
+  .intent{font-size:13px; margin-top:6px; padding:4px; border:2px dashed var(--warn); border-radius:8px; background:#fff8e8;}
+  .intent b{color:var(--red);}
+  .popwrap{position:absolute; left:0; right:0; top:30px; height:0; pointer-events:none;}
+  .pop{position:absolute; left:50%; font-weight:bold; font-size:22px; color:#fff; text-shadow:0 2px 3px #000; animation:floatUp .9s ease-out forwards;}
+  .pop.crit{font-size:30px; color:#ffd84d;} .pop.heal{color:#7cf29b;} .pop.dmgme{color:#ff8a7a;}
+  @keyframes floatUp{0%{opacity:0; transform:translate(-50%,6px) scale(.6)}20%{opacity:1; transform:translate(-50%,-6px) scale(1.1)}100%{opacity:0; transform:translate(-50%,-44px) scale(1)}}
+
+  .zones{display:flex; flex-direction:column; gap:7px; margin:6px 0;}
+  .zone{padding:7px 10px; min-height:70px; transition:background .15s;}
+  .zone.sel{background:#eef5ff;}
+  .ztitle{font-size:13px; font-weight:bold; display:flex; justify-content:space-between;}
+  .zinfo{font-size:11px; color:#555; min-height:15px;}
+  .zdice{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; min-height:42px;}
+  .die{width:42px; height:42px; border-radius:9px; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:bold; color:#fff; cursor:grab; user-select:none; touch-action:none;
+    box-shadow:1px 1px 0 rgba(0,0,0,.2); text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .die:active{transform:scale(.92);}
+  .btnrow{display:flex; gap:8px; margin-top:4px;}
+  button{font-family:inherit; font-size:15px; font-weight:bold; padding:11px; border-radius:10px; border:2px solid var(--ink);
+    background:#fff; cursor:pointer; flex:1; box-shadow:2px 2px 0 rgba(0,0,0,.18);}
+  button:active{transform:translate(1px,1px); box-shadow:1px 1px 0 rgba(0,0,0,.18);}
+  button.primary{background:var(--accent); color:#fff;} button.go{background:var(--good); color:#fff;}
+  button:disabled{opacity:.4; cursor:not-allowed;}
+  .hint{font-size:10px; color:#999; text-align:center; margin-top:5px;}
+  .log{font-size:11px; margin-top:8px; max-height:96px; overflow:auto; padding:6px 10px;}
+  .log div{margin:2px 0;}
+  .toast{position:fixed; left:50%; top:16%; transform:translateX(-50%); background:var(--ink); color:#fff;
+    padding:10px 16px; border-radius:10px; font-size:16px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:9;}
+  .toast.show{opacity:.96;}
+  .helpov{position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:90%; max-width:360px; max-height:86vh; overflow:auto;
+    z-index:20; padding:14px 16px; font-size:13px; line-height:1.5; border:2px solid var(--ink); border-radius:12px; background:#fffdf6; box-shadow:0 6px 24px rgba(0,0,0,.35);}
+  .helpov h3{font-size:15px; margin:.2em 0;} .helpov p{margin:.5em 0;} .helpov button{width:100%; margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎲 Realm of Rolls — Combat Prototype</h1>
+  <div class="sub">Phase 0 · Proof of Fun · "อยากกดทอยอีกรอบไหม?"</div>
+
+  <div class="pbar panel">
+    <span class="lbl">🧙 คุณ</span><span class="val" id="phpTxt">120</span>
+    <div class="hpbar"><div class="hpfill" id="phpBar" style="width:100%;background:var(--good)"></div></div>
+  </div>
+  <div class="equip" id="equip">🎒 ยังไม่มีของ</div>
+
+  <div class="stage panel">
+    <div class="mhead">
+      <span class="badge" id="mBadge">General</span><span id="mName">—</span>
+      <span style="color:#888">Lv <span id="mLv">1</span></span>
+    </div>
+    <div class="sprite" id="mSprite">🟢</div>
+    <div class="mtrack"><div class="mghost" id="mGhost"></div><div class="mfill" id="mFill"></div><div class="mhptxt" id="mHptxt">—</div></div>
+    <div class="intent" id="intent">เล็งตี <b>—</b></div>
+    <div class="popwrap" id="popMon"></div>
+  </div>
+
+  <div class="zones">
+    <div class="zone panel" data-zone="atk">
+      <div class="ztitle"><span>⚔️ โจมตี</span><span id="atkDmg" style="color:var(--red)">0</span></div>
+      <div class="zinfo" id="atkInfo">—</div><div class="zdice" id="atkDice"></div>
+    </div>
+    <div class="zone panel" data-zone="def">
+      <div class="ztitle"><span>🛡️ ป้องกัน</span><span id="defVal" style="color:var(--accent)">0</span></div>
+      <div class="zinfo" id="defInfo">—</div><div class="zdice" id="defDice"></div>
+    </div>
+    <div class="zone panel" data-zone="skl">
+      <div class="ztitle"><span>✨ สกิล (ฮีล — placeholder)</span><span id="sklVal" style="color:var(--good)">0</span></div>
+      <div class="zinfo">รวมแต้ม = ฟื้น HP (ช่องสกิลใน spec ยังไม่ล็อก)</div><div class="zdice" id="sklDice"></div>
+    </div>
+    <div class="zone panel" data-zone="tray">
+      <div class="ztitle"><span>🎲 เต๋าที่ทอยได้</span></div><div class="zdice" id="trayDice"></div>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="primary" id="rollBtn">ทอย 🎲</button>
+    <button class="go" id="confirmBtn" disabled>ยืนยันเทิร์น ✓</button>
+  </div>
+  <div class="hint">ลากเต๋าไปวางในช่อง (หรือแตะเร็ว ๆ เพื่อวนช่อง)</div>
+  <div style="text-align:center;margin-top:4px"><button id="helpBtn" style="flex:0 0 auto;width:auto;padding:6px 14px;font-size:12px">📖 กฎการคิดแต้ม</button></div>
+  <div class="log panel" id="log"></div>
+</div>
+
+<div class="helpov panel" id="help" style="display:none">
+  <h3>📖 กฎการคิดแต้ม</h3>
+  <p><b>ดาเมจ = แต้มรวม + โบนัส Poker + โบนัสสี</b><br><span style="color:#666">ช่องป้องกันใช้สูตรเดียวกัน · สกิล = รวมแต้ม → ฟื้น HP</span></p>
+  <p><b>Poker</b> <span style="color:#666">(เฉพาะเต๋าในช่องนั้น)</span><br>
+    คู่: +5<br>
+    สองคู่: +10<br>
+    ตอง (3 ตัว): +15<br>
+    Full House: +30<br>
+    โฟร์ (4 ตัว): +40<br>
+    ไฟว์ (5 ตัว): +60<br>
+    เรียง 3 / 4 / 5 ลูก: +10 / +20 / +30</p>
+  <p><b>สีเหมือนกันในกอง</b><br>
+    2 สี: +5<br>
+    3 สี: +15<br>
+    4 สี: +30<br>
+    5 สี: +50</p>
+  <p style="color:#888;font-size:11px">🔥 มอน "เกรี้ยว" (ตีแรงขึ้น) เฉพาะตอนยื้อเกินเวลาที่ควรฆ่า — ตั้งรับยันเต็มไม่ได้</p>
+  <button id="helpClose">ปิด</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== ENGINE: สูตรดาเมจ (ระบบบวก) ===================== */
+const NK={five:60,four:40,full:30,three:15,twopair:10,pair:5,single:0};
+const NK_LABEL={five:"Five of a Kind",four:"Four of a Kind",full:"Full House",three:"Three of a Kind",twopair:"Two Pair",pair:"Pair",single:"เลขโดด"};
+const COLORS=["แดง","ฟ้า","เขียว","เหลือง","ม่วง","ส้ม"];
+function straightBonus(run){return run>=5?30:run===4?20:run>=3?10:0;}
+function pokerBonus(nums){
+  if(!nums.length) return {label:NK_LABEL.single,bonus:0};
+  const cnt={}; nums.forEach(n=>cnt[n]=(cnt[n]||0)+1);
+  const counts=Object.values(cnt); const pairs=counts.filter(c=>c>=2).length;
+  const d=[...new Set(nums)].sort((a,b)=>a-b); let run=1,mr=1;
+  for(let i=1;i<d.length;i++){run=d[i]===d[i-1]+1?run+1:1;mr=Math.max(mr,run);}
+  const has=k=>counts.includes(k); const cand=[{l:NK_LABEL.single,b:0}];
+  if(has(5))cand.push({l:NK_LABEL.five,b:NK.five});
+  if(has(4))cand.push({l:NK_LABEL.four,b:NK.four});
+  if(has(3)&&has(2))cand.push({l:NK_LABEL.full,b:NK.full});
+  if(has(3))cand.push({l:NK_LABEL.three,b:NK.three});
+  if(pairs>=2)cand.push({l:NK_LABEL.twopair,b:NK.twopair});
+  if(pairs>=1)cand.push({l:NK_LABEL.pair,b:NK.pair});
+  if(mr>=3)cand.push({l:`Straight ${mr}`,b:straightBonus(mr)});
+  const best=cand.reduce((a,c)=>c.b>a.b?c:a); return {label:best.l,bonus:best.b};
+}
+function colorBonus(cols){
+  if(!cols.length) return 0; const cnt={}; cols.forEach(c=>cnt[c]=(cnt[c]||0)+1);
+  const max=Math.max(...Object.values(cnt)); return ({2:5,3:15,4:30,5:50})[max]||0;
+}
+function scorePile(dice){
+  const sum=dice.reduce((s,d)=>s+d.n,0); const pk=pokerBonus(dice.map(d=>d.n)); const cb=colorBonus(dice.map(d=>d.c));
+  return {sum,pokerLabel:pk.label,pokerBonus:pk.bonus,colorBonus:cb,total:sum+pk.bonus+cb};
+}
+
+/* ===================== MONSTER: เลเวล/tier/สูตรเลือด ===================== */
+const r5=x=>Math.round(x/5)*5;
+const monHP =(L,m)=>r5((70+10*L)*m);
+const monInt=(L,im)=>Math.round((5+0.9*L)*im);
+const TIERS={
+  General:{mult:1, iMult:1,   pool:[["สไลม์เขียว","🟢"],["หนูถ้ำ","🐀"],["ค้างคาวเลือด","🦇"],["แมงป่องทราย","🦂"],["กบยักษ์","🐸"]]},
+  Elite:  {mult:2, iMult:1.3, pool:[["โกเลมหิน","🗿"],["อัศวินโครงกระดูก","💀"],["หมาป่าเงา","🐺"],["แมงมุมราชินี","🕷️"]]},
+  Boss:   {mult:4, iMult:1.7, pool:[["ราชาก็อบลิน","👹"],["มังกรเฒ่าเพลิง","🐉"],["ลอร์ดอันเดด","☠️"],["ปีศาจเขาคู่","😈"]]},
+};
+function tierForWave(w){ if(w%5===0) return "Boss"; if(w%5===3) return "Elite"; return "General"; }
+
+/* ===================== ของดรอป (เวอร์ชันจิ๋ว stack ได้) ===================== */
+const ITEMS=[
+  {key:"sword",name:"ดาบเพลิง",emoji:"⚔️",desc:"เต๋าแดงในช่องโจมตี +2/ลูก"},
+  {key:"armor",name:"เกราะหนัง",emoji:"🛡️",desc:"ดาเมจที่โดน -3"},
+  {key:"glove",name:"ถุงมือนักสู้",emoji:"🧤",desc:"เต๋าเลขคู่ในช่องสกิล ฮีล +2/ลูก"},
+];
+function swordBonus(atk){return atk.filter(d=>d.c===0).length*2*S.equip.sword;}  // c0 = แดง
+function gloveBonus(skl){return skl.filter(d=>d.n%2===0).length*2*S.equip.glove;}
+function armorReduce(){return S.equip.armor*3;}
+function equipText(){
+  const p=ITEMS.filter(it=>S.equip[it.key]>0).map(it=>`${it.emoji}${it.name}${S.equip[it.key]>1?"×"+S.equip[it.key]:""}`);
+  return "🎒 "+(p.length?p.join("  ·  "):"ยังไม่มีของ");
+}
+
+/* ===================== STATE / TUNING ===================== */
+const TUNE={playerHP:120, numDice:5, refDmg:30, enrageStep:4, graceBuffer:3};
+let S=null;
+function newGame(){
+  S={php:TUNE.playerHP, pmax:TUNE.playerHP, wave:0, mon:null, equip:{sword:0,armor:0,glove:0},
+     waveTurn:0, enrage:0, dice:[], zones:{atk:[],def:[],skl:[],tray:[]}, rolls:0, turn:0, rolledThisTurn:false};
+  logClear(); log("เริ่มเกมใหม่ — ลุย Phase 0!");
+  nextWave(true);
+}
+function nextWave(first){
+  S.wave++; S.waveTurn=0; S.enrage=0;
+  const tier=tierForWave(S.wave); const L=Math.min(99,S.wave); const T=TIERS[tier];
+  const [name,emoji]=T.pool[rand(0,T.pool.length-1)];
+  const hp=monHP(L,T.mult);
+  const grace=Math.ceil(hp/TUNE.refDmg)+TUNE.graceBuffer;   // ยื้อเกินเวลาฆ่าที่ควร ค่อยเกรี้ยว
+  S.mon={name,emoji,tier,L,hp,max:hp,grace,baseIntent:0,intent:0};
+  if(!first) toast(`Wave ${S.wave} — ${tier==="Boss"?"⚠️ BOSS ":""}${name} Lv${L}`);
+  startTurn();
+}
+function startTurn(){
+  S.turn++; S.waveTurn++;
+  S.enrage=Math.max(0,(S.waveTurn-S.mon.grace))*TUNE.enrageStep;  // เกรี้ยวเฉพาะยื้อเกิน grace = ปิดช่องโกง ไม่ลงโทษสู้ปกติ
+  const T=TIERS[S.mon.tier];
+  S.mon.baseIntent=monInt(S.mon.L,T.iMult);
+  S.mon.intent=S.mon.baseIntent+S.enrage;
+  S.dice=[]; S.zones={atk:[],def:[],skl:[],tray:[]}; S.rolledThisTurn=false;
+  el("rollBtn").disabled=false; el("rollBtn").textContent="ทอย 🎲"; el("rollBtn").dataset.dead="";
+  el("confirmBtn").disabled=true; render();
+}
+function dropItem(){
+  const it=ITEMS[rand(0,ITEMS.length-1)]; S.equip[it.key]++;
+  toast(`ดรอป! ${it.emoji} ${it.name}${S.equip[it.key]>1?" ×"+S.equip[it.key]:""}`);
+  log(`🎁 ได้ ${it.emoji} ${it.name} — ${it.desc}`);
+}
+function roll(){
+  if(S.rolledThisTurn) return;
+  S.rolledThisTurn=true; S.rolls++; S.dice=[]; S.zones={atk:[],def:[],skl:[],tray:[]};
+  for(let i=0;i<TUNE.numDice;i++){const d={id:i,n:rand(1,6),c:rand(0,5)};S.dice.push(d);S.zones.tray.push(d.id);}
+  el("rollBtn").disabled=true; el("confirmBtn").disabled=false; render();
+}
+function dieById(id){return S.dice.find(d=>d.id===id);}
+function zoneOf(id){for(const z of ["atk","def","skl","tray"])if(S.zones[z].includes(id))return z;return "tray";}
+function moveDie(id,z){const cur=zoneOf(id);if(cur===z)return;S.zones[cur]=S.zones[cur].filter(x=>x!==id);S.zones[z].push(id);render();}
+function cycle(id){const o=["tray","atk","def","skl"];moveDie(id,o[(o.indexOf(zoneOf(id))+1)%o.length]);}
+
+function confirm(){
+  const atk=S.zones.atk.map(dieById), def=S.zones.def.map(dieById), skl=S.zones.skl.map(dieById);
+  const aS=scorePile(atk), dS=scorePile(def);
+  const swB=swordBonus(atk); const dmg=aS.total+swB;
+  const heal=skl.reduce((s,d)=>s+d.n,0)+gloveBonus(skl);
+  // 1) เราตี
+  if(dmg>0){
+    S.mon.hp=Math.max(0,S.mon.hp-dmg);
+    const crit=aS.pokerBonus>=20||aS.colorBonus>=30||dmg>=45;
+    popMon(dmg, crit?"crit":""); shakeSprite();
+    log(`⚔️ ตี ${dmg} (${aS.pokerLabel} +${aS.pokerBonus}, สี +${aS.colorBonus}${swB?`, ดาบ +${swB}`:""})`);
+  }
+  // 2) ฮีล
+  if(heal>0){S.php=Math.min(S.pmax,S.php+heal); popMon("+"+heal,"heal"); log(`✨ ฟื้น +${heal}`);}
+  render();
+  // 3) เคลียร์ wave → ดรอปของ
+  if(S.mon.hp<=0){
+    log(`💥 ล้ม ${S.mon.name}! (${S.waveTurn} เทิร์น)`); dropItem();
+    setTimeout(()=>nextWave(false), 750);
+    el("confirmBtn").disabled=true; el("rollBtn").disabled=true; return;
+  }
+  // 4) มอนตีกลับ (ลดด้วยป้องกัน + เกราะ)
+  const block=dS.total, ar=armorReduce(); const incoming=Math.max(0,S.mon.intent-block-ar);
+  S.php=Math.max(0,S.php-incoming);
+  log(`🛡️ กัน ${block}${ar?`+เกราะ ${ar}`:""} · โดน ${incoming}${S.enrage?` (เกรี้ยว +${S.enrage})`:""}`);
+  if(incoming>0) popMe(incoming);
+  render();
+  if(S.php<=0){
+    log("☠️ คุณแพ้! กดเริ่มใหม่"); toast("Game Over");
+    el("rollBtn").textContent="เริ่มใหม่ ↻"; el("rollBtn").disabled=false; el("rollBtn").dataset.dead="1";
+    el("confirmBtn").disabled=true; return;
+  }
+  startTurn();
+}
+
+/* ===================== JUICE ===================== */
+function popMon(text,cls){const w=el("popMon");const s=document.createElement("div");s.className="pop "+(cls||"");s.textContent=text;s.style.left=(50+rand(-18,18))+"%";w.appendChild(s);setTimeout(()=>s.remove(),900);}
+function popMe(text){const w=el("popMon");const s=document.createElement("div");s.className="pop dmgme";s.textContent="-"+text;s.style.left=(50+rand(-10,10))+"%";s.style.top="-150px";w.appendChild(s);setTimeout(()=>s.remove(),900);
+  const b=el("phpBar");b.style.background="#ff3b2f";setTimeout(()=>b.style.background="var(--good)",180);}
+function shakeSprite(){const s=el("mSprite");s.classList.remove("hit");void s.offsetWidth;s.classList.add("hit");}
+
+/* ===================== RENDER ===================== */
+function el(id){return document.getElementById(id);}
+function dieEl(d){const e=document.createElement("div");e.className="die";e.textContent=d.n;e.style.background=`var(--c${d.c})`;e.title=COLORS[d.c];e.addEventListener("pointerdown",ev=>startDrag(ev,d.id));return e;}
+function render(){
+  el("phpTxt").textContent=S.php; el("phpBar").style.width=(100*S.php/S.pmax)+"%";
+  el("equip").textContent=equipText();
+  const m=S.mon;
+  el("mBadge").textContent=m.tier; el("mBadge").className="badge b-"+m.tier;
+  el("mName").textContent=m.name; el("mLv").textContent=m.L; el("mSprite").textContent=m.emoji;
+  const pct=100*m.hp/m.max; el("mFill").style.width=pct+"%"; el("mGhost").style.width=pct+"%";
+  el("mHptxt").textContent=`${m.hp} / ${m.max}`;
+  const toRage=m.grace-S.waveTurn+1;
+  const rageTxt=S.enrage?` <span style="color:#d4380d">🔥 เกรี้ยว +${S.enrage}</span>`:(toRage<=3?` <span style="color:#d98a00">🔥 อีก ${toRage} เทิร์นเกรี้ยว</span>`:"");
+  el("intent").innerHTML=`เล็งตี <b>${m.intent}</b>${rageTxt} &nbsp;·&nbsp; <span style="color:#999">เทิร์น ${S.waveTurn}</span>`;
+  for(const z of ["atk","def","skl","tray"]){const box=el(z+"Dice");box.innerHTML="";S.zones[z].forEach(id=>box.appendChild(dieEl(dieById(id))));}
+  const atk=S.zones.atk.map(dieById), def=S.zones.def.map(dieById), skl=S.zones.skl.map(dieById);
+  const aS=scorePile(atk), dS=scorePile(def); const swB=swordBonus(atk); const glB=gloveBonus(skl);
+  el("atkDmg").textContent=aS.total+swB;
+  el("atkInfo").textContent=atk.length?`แต้ม ${aS.sum} + ${aS.pokerLabel} ${aS.pokerBonus} + สี ${aS.colorBonus}${swB?` + ดาบ ${swB}`:""}`:"—";
+  el("defVal").textContent=dS.total;
+  el("defInfo").textContent=def.length?`แต้ม ${dS.sum} + ${dS.pokerLabel} ${dS.pokerBonus} + สี ${dS.colorBonus}`:"—";
+  el("sklVal").textContent=skl.reduce((s,d)=>s+d.n,0)+glB;
+}
+
+/* ===================== DRAG (mouse+touch) ===================== */
+let drag=null;
+function startDrag(ev,id){ev.preventDefault();drag={id,sx:ev.clientX,sy:ev.clientY,moved:false,ghost:null};window.addEventListener("pointermove",onDragMove);window.addEventListener("pointerup",onDragUp);}
+function onDragMove(ev){
+  if(!drag)return;
+  if(!drag.moved&&Math.hypot(ev.clientX-drag.sx,ev.clientY-drag.sy)>6){
+    drag.moved=true;const d=dieById(drag.id);const g=document.createElement("div");g.className="die";g.textContent=d.n;
+    g.style.cssText=`position:fixed;z-index:50;pointer-events:none;width:42px;height:42px;background:var(--c${d.c});opacity:.9`;
+    document.body.appendChild(g);drag.ghost=g;
+  }
+  if(drag.moved){drag.ghost.style.left=(ev.clientX-21)+"px";drag.ghost.style.top=(ev.clientY-21)+"px";clearHL();const z=zoneAt(ev.clientX,ev.clientY);if(z)z.el.classList.add("sel");}
+}
+function onDragUp(ev){
+  window.removeEventListener("pointermove",onDragMove);window.removeEventListener("pointerup",onDragUp);
+  if(!drag)return;clearHL();
+  if(drag.moved){if(drag.ghost)drag.ghost.remove();const z=zoneAt(ev.clientX,ev.clientY);if(z)moveDie(drag.id,z.name);}
+  else cycle(drag.id);
+  drag=null;
+}
+function zoneAt(x,y){const t=document.elementFromPoint(x,y);const z=t&&t.closest(".zone");return z?{el:z,name:z.dataset.zone}:null;}
+function clearHL(){document.querySelectorAll(".zone.sel").forEach(z=>z.classList.remove("sel"));}
+
+/* ===================== UTIL / WIRE ===================== */
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function log(m){const l=el("log");const d=document.createElement("div");d.textContent=m;l.prepend(d);}
+function logClear(){el("log").innerHTML="";}
+let tT; function toast(m){const t=el("toast");t.textContent=m;t.classList.add("show");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("show"),1300);}
+el("helpBtn").onclick=()=>el("help").style.display="block";
+el("helpClose").onclick=()=>el("help").style.display="none";
+el("rollBtn").onclick=()=>{ if(el("rollBtn").dataset.dead){newGame();return;} roll(); };
+el("confirmBtn").onclick=confirm;
+newGame();
+</script>
+</body>
+</html>
