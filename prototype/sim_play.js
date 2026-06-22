@@ -11,7 +11,7 @@ function score(d){return d.reduce((a,x)=>a+x.n,0)+poker(d.map(x=>x.n))+colorB(d.
 const r5=x=>Math.round(x/5)*5;const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;const SKT=[0,4,9,18];
 function skillTier(d){const n=d.length;if(!n)return 0;const s=d.reduce((a,x)=>a+x.n,0);return Math.min(3,Math.ceil(s/(2*n)));}
 const genHP=L=>16+L*4, eliteHP=L=>Math.round((16+L*4)*1.45), bossHP=L=>Math.round((16+L*4)*2.0);
-const genInt=L=>Math.round(3+L*0.8), eliteInt=L=>Math.round((3+L*0.8)*1.3), bossInt=L=>Math.round((3+L*0.8)*1.55);
+const genInt=L=>Math.round(3+L*0.8), eliteInt=L=>Math.round((3+L*0.8)*1.45), bossInt=L=>Math.round((3+L*0.8)*1.7);
 const refDmg=[0,10,13,17,23,30],xpNeed=lv=>4+lv*3,tierSpd={G:4,E:7,B:6};
 const ZONES=[{lv:[1,4],bl:6},{lv:[4,8],bl:10},{lv:[8,14],bl:16},{lv:[14,22],bl:24}];
 function rollDice(n){const d=[];for(let i=0;i<n;i++)d.push({n:rnd(1,6),c:rnd(0,5)});return d;}
@@ -42,11 +42,11 @@ function run(){
     while(true){walks++;if(walks>1500)return{done:false,deaths};
       let kind,L;if(Math.random()*100<boss){kind="B";L=Z.bl;}else if(Math.random()<0.12){kind="E";L=Z.lv[1]+1;}else{kind="G";L=rnd(Z.lv[0],Z.lv[1]);boss=Math.min(60,boss+5);}
       if(!fight(P,L,kind)){deaths++;P.hp=Math.max(1,Math.round(P.maxhp*.3));continue;}
-      P.xp+=L;while(P.xp>=xpNeed(P.lvl)){P.xp-=xpNeed(P.lvl);P.lvl++;rec();P.hp=Math.min(P.maxhp,P.hp+12);}
+      P.xp+=L;while(P.xp>=xpNeed(P.lvl)){P.xp-=xpNeed(P.lvl);P.lvl++;rec();P.hp=Math.min(P.maxhp,P.hp+10);}
       P.gold+=rnd(4,9)*L;const pool=kind==="B"?BD[zi]:GP[zi];const dr=kind==="B"?1:(kind==="E"?0.9:0.6);
       if(Math.random()<dr){const g=parse(pool[rnd(0,pool.length-1)]);const cur=slots[g.slot]||{};const ns=g.atk+g.def+g.hp+g.spd;const cs=(cur.atk||0)+(cur.def||0)+(cur.hp||0)+(cur.spd||0);if(ns>cs){slots[g.slot]={atk:g.atk,def:g.def,hp:g.hp,spd:g.spd};rec();}}
       if(P.gold>=15&&P.potions<3){P.gold-=15;P.potions++;}
-      rec();P.hp=Math.min(P.maxhp,P.hp+Math.round(P.maxhp*0.15));
+      rec();P.hp=Math.min(P.maxhp,P.hp+Math.round(P.maxhp*0.10));
       if(kind==="B"){if(P.dice<5)P.dice++;break;}
     }
   }
