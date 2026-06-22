@@ -11,7 +11,8 @@ function score(d){return d.reduce((a,x)=>a+x.n,0)+poker(d.map(x=>x.n))+colorB(d.
 const r5=x=>Math.round(x/5)*5;const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 /* ----- ค่า sync กับเกม ----- */
 const genHP=L=>16+L*4,eliteHP=L=>Math.round((16+L*4)*1.45),bossHP=L=>Math.round((16+L*4)*2.0);
-const intentOf=(k,L)=>Math.round((3+L*0.75)*(k==="B"?1.5:k==="E"?1.3:1));   // gen 3+0.75L · elite ×1.3 · boss ×1.5
+const intentOf=(k,L)=>Math.round((3+L*0.7)*(k==="B"?1.35:k==="E"?1.2:1));   // gen 3+0.7L · elite ×1.2 · boss ×1.35
+const armorOf=(k,L)=>Math.floor(L*(k==="B"?0.25:k==="E"?0.15:0.08));        // #1 เกราะมอน
 const refDmg=[0,10,13,17,23,30],xpNeed=lv=>4+lv*3,tierSpd={G:4,E:7,B:6};
 const GB=4,ES=3,LH=10;                                  // graceBuf, estep, levelup heal
 const GEARG=0.25,GEARE=0.45;                            // ดรอป gear: ทั่วไป 25% · elite 45% · boss 100%
@@ -22,15 +23,15 @@ function bestOff(dice,P){const a=score(dice)+P.atk;const s=(P.sp>=3)?sumN(dice)+
 function fight(P,L,kind){
   P.sp=P.maxsp; // เดินมาถึงมอน = SP เต็ม (regen ระหว่างทาง)
   const dr0=refDmg[Math.min(5,P.dice)];const HP=kind==="B"?bossHP(L):kind==="E"?eliteHP(L):genHP(L);
-  let hp=r5(HP);const grace=Math.ceil(hp/dr0)+GB;const mspd=tierSpd[kind]+Math.floor(L/5);let wt=0;
-  while(true){wt++;P.sp=Math.min(P.maxsp,P.sp+1);
+  let hp=r5(HP);const grace=Math.ceil(hp/dr0)+GB;const mspd=tierSpd[kind]+Math.floor(L/5);const armor=armorOf(kind,L);let wt=0;
+  while(true){wt++;if(wt%3===0)P.sp=Math.min(P.maxsp,P.sp+1);
     const en=Math.max(0,(wt-grace))*ES;const intent=intentOf(kind,L)+en;
     let dice=rollDice(P.dice);const rr=Math.max(5,Math.min(60,10+(P.spd-mspd)*5));
     if(Math.random()*100<rr){const d2=rollDice(P.dice);if(bestOff(d2,P)>bestOff(dice,P))dice=d2;} // Speed reroll
     if(P.hp<P.maxhp*0.4){if(P.potions>0){P.hp=Math.min(P.maxhp,P.hp+25);P.potions--;}else if(P.apples>0){P.hp=Math.min(P.maxhp,P.hp+12);P.apples--;}} // 1 ยา/เทิร์น
     const atkOpt=score(dice)+P.atk;const sklOpt=(P.sp>=3)?sumN(dice)+dice.length*4:-1;
-    let off,useSP=0;if(sklOpt>atkOpt){off=sklOpt;useSP=3;}else off=atkOpt;
-    let sp=null;if(P.dice>=2){const h=Math.ceil(P.dice/2),Aa=dice.slice(0,h),D=dice.slice(h);sp={dmg:score(Aa)+P.atk,bl:score(D)};}
+    let off,useSP=0;if(sklOpt>atkOpt){off=sklOpt;useSP=3;}else off=atkOpt;off=Math.max(1,off-armor);
+    let sp=null;if(P.dice>=2){const h=Math.ceil(P.dice/2),Aa=dice.slice(0,h),D=dice.slice(h);sp={dmg:Math.max(1,score(Aa)+P.atk-armor),bl:score(D)};}
     const slower=mspd>P.spd;let dealt=0,inc=0,killed=false;
     if(off>=hp){killed=true;dealt=off;if(useSP)P.sp-=useSP;}
     else{const pf=Math.max(0,intent-P.def);

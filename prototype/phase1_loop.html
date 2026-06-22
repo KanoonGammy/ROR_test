@@ -18,6 +18,7 @@
   .pill{border:2px solid var(--ink);border-radius:8px;padding:2px 8px;background:#fff;font-size:13px;cursor:pointer;}
   .pill:active{transform:translateY(1px);}
   .fleemini{font-size:11px;padding:4px 10px;width:auto;background:#b5642d;color:#fff;box-shadow:1px 1px 0 rgba(0,0,0,.18);opacity:.8;}
+  #ver{position:fixed;right:5px;bottom:3px;font-size:10px;color:#999;z-index:7;pointer-events:none;opacity:.7;}
   .xpbar{height:6px;border:1px solid var(--ink);border-radius:4px;overflow:hidden;background:#eee;margin-bottom:8px;}
   .xpfill{height:100%;background:#7d4fd0;transition:width .3s;}
   button{font-family:inherit;font-size:16px;font-weight:bold;padding:11px;border-radius:10px;border:2px solid var(--ink);background:#fff;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.18);}
@@ -53,6 +54,7 @@
   .pdoll-cell{border:2px dashed #bbb;border-radius:10px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:pointer;background:#fff;padding:2px;}
   .pdoll-cell.has{border-style:solid;border-color:var(--ink);box-shadow:1px 1px 0 rgba(0,0,0,.15);} .pdoll-cell.center{font-size:40px;}
   .pd-emoji{font-size:26px;line-height:1;} .pd-nm{font-size:9px;color:#555;text-align:center;} .pd-empty{color:#bbb;font-size:16px;text-align:center;}
+  .pd-st{font-size:9px;color:#2e9e57;text-align:center;font-weight:bold;line-height:1.2;}
   .invgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
   .inv-item{border:2px solid var(--ink);border-radius:8px;padding:5px 7px;font-size:11px;cursor:pointer;background:#fff;box-shadow:1px 1px 0 rgba(0,0,0,.15);text-align:center;min-width:60px;}
   .inv-item.act{background:#eafaef;border-color:var(--good);} .inv-item .ie{font-size:22px;} .empty-note{font-size:11px;color:#999;}
@@ -252,6 +254,7 @@
   <button class="full primary" id="winRestart">เล่นใหม่</button>
 </div>
 <audio id="bgm" src="08.mp3" loop preload="auto"></audio>
+<div id="ver"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -272,13 +275,14 @@ function scorePile(d){const s=d.reduce((a,x)=>a+x.n,0);const p=pokerBonus(d.map(
 const r5=x=>Math.round(x/5)*5;const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 /* ===== BALANCE ===== */
 const BAL={genHP:L=>16+L*4, eliteHP:L=>Math.round((16+L*4)*1.45), bossHP:L=>Math.round((16+L*4)*2.0),
-  genInt:L=>Math.round(3+L*0.75), eliteInt:L=>Math.round((3+L*0.75)*1.3), bossInt:L=>Math.round((3+L*0.75)*1.5),
+  genInt:L=>Math.round(3+L*0.7), eliteInt:L=>Math.round((3+L*0.7)*1.2), bossInt:L=>Math.round((3+L*0.7)*1.35),
+  genDef:L=>Math.floor(L*0.08), eliteDef:L=>Math.floor(L*0.15), bossDef:L=>Math.floor(L*0.25),
   refDmg:[0,10,13,17,23,30], graceBuf:4, estep:3, xpNeed:lv=>4+lv*3, hpPerLv:3,
   tierSpd:{General:4,Elite:7,Boss:6}, baseSpd:5, regenPct:0.04};
 const SKILLS={
   smash:{name:"ทุ่มพลัง",emoji:"💢",sp:3,desc:"ดาเมจ = แต้มรวม + (จำนวนเต๋า×4) — แรง เชื่อถือได้ · ใช้ 3 SP"},
-  drain:{name:"ดูดเลือด",emoji:"🩸",sp:3,desc:"ดาเมจ = แต้มรวม + (เต๋า×2) · ฟื้น HP ครึ่งหนึ่ง · ใช้ 3 SP"},
   guard:{name:"กำบัง",emoji:"🛡️",sp:2,desc:"ดาเมจ = แต้มรวม · เกราะ = แต้ม + (เต๋า×2) · ใช้ 2 SP"},
+  // 🩸 ดูดเลือด ย้ายไปเป็นของอาวุธ/สกิลอาชีพ Phase 2 (ถอดจาก Novice ตามที่เคาะ)
 };
 const BOSSSKILL={ent:"รากทิ่มแทง",ram:"พุ่งชนเขา",mino:"ฟันขวานยักษ์",dragon:"ลมหายใจเพลิง"};
 // สกิล Novice 3 แบบ — ระบบบวก เลขกลม "เชื่อถือได้" ไม่พึ่งคอมโบ/สี/เลขซ้ำ
@@ -370,7 +374,7 @@ function defTotal(){return statTotal("def")+Math.floor((P.lvl-1)/2);}
 function spdTotal(){return BAL.baseSpd+statTotal("spd");}
 function minionColor(){const k=P.activeMinion;const p=k&&MONS[k].passive;return(p&&p.col!==undefined)?{col:p.col,val:p.colVal}:null;}
 function colorAtkBonus(atk){const mc=minionColor();if(!mc)return 0;return atk.filter(d=>d.c===mc.col).length*mc.val;}
-function recalc(){P.maxhp=30+statTotal("hp")+(P.lvl-1)*BAL.hpPerLv;if(P.hp>P.maxhp)P.hp=P.maxhp;P.maxsp=6+Math.floor((P.lvl-1)/2);if(P.sp==null)P.sp=P.maxsp;if(P.sp>P.maxsp)P.sp=P.maxsp;}
+function recalc(){P.maxhp=30+statTotal("hp")+(P.lvl-1)*BAL.hpPerLv;if(P.hp>P.maxhp)P.hp=P.maxhp;P.maxsp=6+Math.floor((P.lvl-1)/2);if(P.sp==null)P.sp=P.maxsp;if(P.sp>P.maxsp)P.sp=P.maxsp;if(!SKILLS[P.skill])P.skill="smash";}
 function gainXP(L){P.xp+=L;while(P.xp>=BAL.xpNeed(P.lvl)){P.xp-=BAL.xpNeed(P.lvl);P.lvl++;const st=((P.lvl-1)%2===1)?"🗡️โจมตี":"🛡️ป้องกัน";recalc();P.sp=P.maxsp;P.hp=Math.min(P.maxhp,P.hp+10);toast(`⭐ Lv ${P.lvl}! ❤️+3 · ${st}+1`);log(`⭐ เลเวลอัพ Lv ${P.lvl} — ❤️HP +3, ${st} +1, ฟื้น HP +10`);}}
 
 /* ===== EQUIP / CARD SOCKET ===== */
@@ -389,7 +393,7 @@ function renderChar(){
   renderStatus();
   el("charStats").innerHTML=`<span>Lv ${P.lvl}</span><span>❤️ ${P.hp}/${P.maxhp}</span><span>🗡️ ${atkTotal()}</span><span>🛡️ ${defTotal()}</span><span>⚡ ${spdTotal()}</span>`;
   const sl=(slot,big)=>{const inst=P.equip[slot];const g=inst?GEAR[inst.gid]:null;
-    return `<div class="pdoll-cell${g?" has":""}${big?" center":""}" ${g?`style="border-color:${RAR[rOf(inst)].c}"`:""} onclick="unequip('${slot}')">`+(g?`<div class="pd-emoji"${big?' style="font-size:36px"':""}>${g.emoji}</div><div class="pd-nm" style="color:${RAR[rOf(inst)].c}">${rOf(inst)>0?RAR[rOf(inst)].n+" ":""}${g.name}</div>`:(big?"🧍":`<div class="pd-empty">${SLOTI[slot]}<br>ว่าง</div>`))+`</div>`;};
+    return `<div class="pdoll-cell${g?" has":""}${big?" center":""}" ${g?`style="border-color:${RAR[rOf(inst)].c}"`:""} onclick="unequip('${slot}')">`+(g?`<div class="pd-emoji"${big?' style="font-size:36px"':""}>${g.emoji}</div><div class="pd-nm" style="color:${RAR[rOf(inst)].c}">${rOf(inst)>0?RAR[rOf(inst)].n+" ":""}${g.name}</div><div class="pd-st">${gearStatStr(inst)}${cardSumStr(inst)?" +🎴"+cardSumStr(inst):""}</div>`:(big?"🧍":`<div class="pd-empty">${SLOTI[slot]}<br>ว่าง</div>`))+`</div>`;};
   el("paperdoll").innerHTML=`<div></div>${sl("head")}<div></div>${sl("weapon")}${sl("body",1)}${sl("shield")}<div></div>${sl("legs")}<div></div>`;
   // card boxes per equipped gear
   let gc="";
@@ -453,16 +457,22 @@ function render(){renderStatus();}
 function placeObj(grid,W,H,px,py,obj){for(let t=0;t<40;t++){const x=rand(0,W-1),y=rand(0,H-1);if(x===px&&y===py)continue;if(grid[y][x])continue;grid[y][x]=obj;return;}}
 function placeRand(grid,W,H,px,py,key){placeObj(grid,W,H,px,py,{key});}
 const ZDECO={forest:["🌲","🌳"],grass:["🌳","🌾"],cave:["🪨","💎"],volcano:["🪨","🌋"]};
-function genGrid(zk){const z=ZONES[zk];const W=7,H=5;const grid=[];for(let y=0;y<H;y++)grid.push(new Array(W).fill(null));
-  const px=0,py=H-1; grid[0][W-1]={key:z.boss};
-  placeRand(grid,W,H,px,py,z.elite);
-  for(let i=0;i<7;i++)placeRand(grid,W,H,px,py,z.pool[rand(0,z.pool.length-1)]);
-  const dc=ZDECO[zk]||["🌳"];for(let i=0;i<6;i++)placeObj(grid,W,H,px,py,{deco:dc[rand(0,dc.length-1)]});
-  EX={zk,W,H,grid,px,py,fightAt:null};}
+function reachable(grid,W,H,sx,sy,tx,ty){const seen=Array.from({length:H},()=>new Array(W).fill(false));const q=[[sx,sy]];seen[sy][sx]=true;
+  while(q.length){const c=q.shift();if(c[0]===tx&&c[1]===ty)return true;for(const d of [[0,1],[0,-1],[1,0],[-1,0]]){const nx=c[0]+d[0],ny=c[1]+d[1];if(nx<0||ny<0||nx>=W||ny>=H||seen[ny][nx])continue;if(grid[ny][nx]&&grid[ny][nx].deco)continue;seen[ny][nx]=true;q.push([nx,ny]);}}return false;}
+function genGrid(zk,deep){const z=ZONES[zk];const W=8,H=6,px=0,py=H-1,bx=W-1,by=0;let grid,tries=0;
+  do{grid=[];for(let y=0;y<H;y++)grid.push(new Array(W).fill(null));
+    if(!deep)grid[by][bx]={key:z.boss};
+    placeRand(grid,W,H,px,py,z.elite);
+    for(let i=0;i<9;i++)placeRand(grid,W,H,px,py,z.pool[rand(0,z.pool.length-1)]);
+    const dc=ZDECO[zk]||["🌳"];for(let i=0;i<8;i++)placeObj(grid,W,H,px,py,{deco:dc[rand(0,dc.length-1)]});
+    tries++;
+  }while(!deep && !reachable(grid,W,H,px,py,bx,by) && tries<30);
+  EX={zk,W,H,grid,px,py,fightAt:null,deep:!!deep};}
 function respawnMon(){if(!EX)return;const z=ZONES[EX.zk];placeRand(EX.grid,EX.W,EX.H,EX.px,EX.py,z.pool[rand(0,z.pool.length-1)]);if(Math.random()<0.12)placeRand(EX.grid,EX.W,EX.H,EX.px,EX.py,z.elite);}
 function enterZone(zk){genGrid(zk);show("Explore");renderExplore();}
+function enterDeep(zk){genGrid(zk,true);show("Explore");renderExplore();toast("🌲 เข้าป่าลึก — มอนแรงขึ้น ของดีขึ้น!");}
 function renderExplore(){const z=ZONES[EX.zk];
-  el("exploreHead").innerHTML=`<b>${z.emoji} เขต${z.name} (Lv ${z.lv[0]}-${z.lv[1]})</b><br><span style="font-size:12px;color:#888">เหยียบมอน=สู้ · 🧙=คุณ · กรอบแดง=บอส · เดินชนขอบ=ออกสู่แผนที่โลก 🌍</span>`;
+  el("exploreHead").innerHTML=`<b>${z.emoji} ${EX.deep?"ป่าลึก"+z.name:"เขต"+z.name} (Lv ${z.lv[0]}-${z.lv[1]}${EX.deep?"+":""})</b><br><span style="font-size:12px;color:#888">เหยียบมอน=สู้ · 🧙=คุณ${EX.deep?"":(P.bossDone[EX.zk]?" · เดินขึ้นขอบบน=เข้าป่าลึก 🌲":" · กรอบแดง=บอส")} · ชนขอบ=ออกแผนที่โลก 🌍</span>`;
   let h=`<div class="mapgrid" style="grid-template-columns:repeat(${EX.W},44px)">`;
   for(let y=0;y<EX.H;y++)for(let x=0;x<EX.W;x++){
     let cls="tile",c="<span style='color:#e0d8c6'>·</span>";
@@ -472,14 +482,16 @@ function renderExplore(){const z=ZONES[EX.zk];
       else if(t&&t.deco){cls+=" deco";c=t.deco;}}
     h+=`<div class="${cls}">${c}</div>`;}
   el("mapGrid").innerHTML=h+`</div>`;}
-function move(dx,dy){if(!EX)return;const tx=EX.px+dx,ty=EX.py+dy;if(tx<0||ty<0||tx>=EX.W||ty>=EX.H){returnToWorld();return;}
+function move(dx,dy){if(!EX)return;const tx=EX.px+dx,ty=EX.py+dy;
+  if(ty<0){if(!EX.deep&&P.bossDone[EX.zk])return enterDeep(EX.zk);return returnToWorld();}
+  if(tx<0||tx>=EX.W||ty>=EX.H){returnToWorld();return;}
   const t=EX.grid[ty][tx];
   if(t&&t.deco)return;
   if(t&&t.key){EX.fightAt={x:tx,y:ty};startCombat(t.key);}else{EX.px=tx;EX.py=ty;regenStep();renderExplore();}}
 function clearFightTile(){if(EX&&EX.fightAt){EX.grid[EX.fightAt.y][EX.fightAt.x]=null;EX.px=EX.fightAt.x;EX.py=EX.fightAt.y;EX.fightAt=null;}}
 /* ===== TOWN (เดินได้) ===== */
 let TOWN=null;
-function regenStep(){if(!P)return;if(P.hp<P.maxhp)P.hp=Math.min(P.maxhp,P.hp+Math.max(1,Math.ceil(P.maxhp*BAL.regenPct)));if(P.sp<P.maxsp)P.sp=Math.min(P.maxsp,P.sp+1);}
+function regenStep(){} // ฟื้นเลือดเปลี่ยนไปคิดตามเวลา (setInterval) ไม่ผูกกับก้าวเดินแล้ว
 function genTown(){const W=7,H=5;const g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(null));
   for(let x=0;x<W;x++){g[0][x]={wall:1};g[H-1][x]={wall:1};}
   for(let y=0;y<H;y++){g[y][0]={wall:1};g[y][W-1]={wall:1};}
@@ -535,11 +547,14 @@ function worldMove(dx,dy){if(!WORLD)return;const tx=WORLD.px+dx,ty=WORLD.py+dy;
 
 /* ===== COMBAT ===== */
 function startCombat(key){
-  P.seen[key]=true;const m=MONS[key];const z=ZONES[EX.zk];const L=m.boss?z.bossLv:(m.tier==="Elite"?z.lv[1]+1:rand(z.lv[0],z.lv[1]));
+  P.seen[key]=true;const m=MONS[key];const z=ZONES[EX.zk];
+  let L=m.boss?z.bossLv:(m.tier==="Elite"?z.lv[1]+1:rand(z.lv[0],z.lv[1]));
+  if(EX.deep)L+=rand(2,6);
   const hp=r5(m.boss?BAL.bossHP(L):(m.tier==="Elite"?BAL.eliteHP(L):BAL.genHP(L)));
+  const armor=m.boss?BAL.bossDef(L):(m.tier==="Elite"?BAL.eliteDef(L):BAL.genDef(L));
   const ref=BAL.refDmg[Math.min(5,P.dice)];const grace=Math.ceil(hp/ref)+BAL.graceBuf;
   const spd=BAL.tierSpd[m.tier]+Math.floor(L/5);
-  C={key,L,hp,max:hp,grace,spd,wt:0,enrage:0,intent:0,dice:[],z:{atk:[],def:[],skl:[],tray:[]},rolled:false,reroll:false};
+  C={key,L,hp,max:hp,armor,grace,spd,wt:0,enrage:0,intent:0,dice:[],z:{atk:[],def:[],skl:[],tray:[]},rolled:false,reroll:false};
   show("Combat");logClear();log(`เจอ ${m.emoji} ${m.name} Lv${L}!`);startTurn();
 }
 function startTurn(){
@@ -551,7 +566,7 @@ function startTurn(){
   let base=(m.boss?BAL.bossInt(C.L):(m.tier==="Elite"?BAL.eliteInt(C.L):BAL.genInt(C.L)));
   if(C.skillTurn)base=Math.round(base*mul);
   C.intent=base+C.enrage;
-  C.dice=[];C.z={atk:[],def:[],skl:[],tray:[]};C.rolled=false;C.reroll=false;C.itemUsed=false;P.sp=Math.min(P.maxsp,(P.sp||0)+1);
+  C.dice=[];C.z={atk:[],def:[],skl:[],tray:[]};C.rolled=false;C.reroll=false;C.itemUsed=false;if(C.wt%3===0)P.sp=Math.min(P.maxsp,(P.sp||0)+1); // SP ฟื้น +1 ทุก 3 เทิร์น
   el("rollBtn").disabled=false;el("rollBtn").style.display="";el("confirmBtn").disabled=true;el("capBtn").style.display="none";renderCombat();
 }
 function doRoll(){C.dice=[];C.z={atk:[],def:[],skl:[],tray:[]};for(let i=0;i<P.dice;i++){C.dice.push({id:i,n:rand(1,6),c:rand(0,5)});C.z.tray.push(i);}}
@@ -585,9 +600,10 @@ function confirm(){
   const dmg=atkDmg+skillDmg;
   const slower=C.spd>spdTotal();   // เราช้ากว่ามอน → โดนสวนแม้ฆ่าได้
   const crit=aS.pokerBonus>=20||aS.colorBonus>=30||skillDmg>=25||dmg>=50;
-  if(dmg>0){C.hp=Math.max(0,C.hp-dmg);
+  const eff=dmg>0?Math.max(1,dmg-(C.armor||0)):0;
+  if(eff>0){C.hp=Math.max(0,C.hp-eff);
     let fxType="slash";if(aS.pokerLabel&&aS.pokerLabel.indexOf("Straight")>=0)fxType="pierce";else if(crit||(skillDmg>0&&skillDmg>=atkDmg))fxType="smash";
-    fxHit(fxType);pop(dmg,skillDmg&&!atkDmg?"skl":(crit?"crit":""));shake();log(`⚔️ ตี ${dmg}${skillDmg?` (สกิล +${skillDmg})`:""}`);}
+    fxHit(fxType);pop(eff,skillDmg&&!atkDmg?"skl":(crit?"crit":""));shake();log(`⚔️ ตี ${eff}${C.armor?` (เกราะมอน -${C.armor})`:""}${skillDmg?" · สกิล":""}`);}
   if(skl.length&&sr.heal>0&&C.hp>0){P.hp=Math.min(P.maxhp,P.hp+sr.heal);pop("+"+sr.heal,"heal");log(`🩸 ดูดเลือด +${sr.heal}`);}
   renderCombat();
   const killed=C.hp<=0;
@@ -658,7 +674,7 @@ function renderCombat(){
   const pct=100*C.hp/C.max;el("mFill").style.width=pct+"%";el("mGhost").style.width=pct+"%";el("mHptxt").textContent=`${C.hp}/${C.max}`;
   el("pFill").style.width=(100*P.hp/P.maxhp)+"%";el("pHptxt").textContent=`${P.hp}/${P.maxhp}`;
   el("pStats").innerHTML=`🗡️${atkTotal()} 🛡️${defTotal()} ⚡${spdTotal()} 🔷${P.sp}/${P.maxsp}`;el("mName2").textContent=m.name;
-  el("mStats").innerHTML=`🗡️${C.intent} ⚡${C.spd} 🔥t${C.grace+1}`;
+  el("mStats").innerHTML=`🗡️${C.intent} 🛡️${C.armor||0} ⚡${C.spd}`;
   const toR=Math.max(0,C.grace-C.wt+1);const fast=spdTotal()>=C.spd;
   const rage=C.enrage?`🔥 เกรี้ยว +${C.enrage} dmg (เพิ่ม +${BAL.estep}/เทิร์น)`:`🔥 เกรี้ยวในอีก ${toR} เทิร์น (แล้ว +${BAL.estep} dmg/เทิร์น)`;
   const skLine=C.skillTurn?`<div style="color:#d4380d;font-weight:bold">💥 ${C.sname}! (สกิลมอน ตีแรง)</div>`:(C.mEvery&&((C.wt+1)%C.mEvery===0)?`<div style="color:#d98a00">⚠️ เทิร์นหน้ามอนใช้ ${C.sname}</div>`:"");
@@ -752,6 +768,9 @@ el("winRestart").onclick=()=>{clearSave();newGame();};
 el("newBtn").onclick=()=>{clearSave();newGame();};
 // ป็อปอัพ modal (ต้องกดปุ่มในนั้นเท่านั้น) — คลิกฉากมืดไม่ปิด กันค้าง/กดพลาด
 el("scrim").onclick=()=>{for(const o of["intro","winmon","winov"])if(el(o).style.display==="block")return;closeOvl();};
+const VERSION="v0.9.1 · 2026-06-22";el("ver").textContent=VERSION;
+// ฟื้นเลือดตามเวลา: +1 HP/วินาที (นอกการต่อสู้) · SP +1 ทุก 3 วินาที
+setInterval(()=>{if(!P)return;if(el("screenCombat").style.display!=="none")return;let ch=false;if(P.hp<P.maxhp){P.hp++;ch=true;}P._spT=(P._spT||0)+1;if(P._spT>=3){P._spT=0;if(P.sp<P.maxsp){P.sp++;ch=true;}}if(ch)renderStatus();},1000);
 boot();
 </script>
 </body>
