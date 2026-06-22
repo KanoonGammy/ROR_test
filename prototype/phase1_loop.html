@@ -32,19 +32,19 @@
   .sprite{font-size:46px;display:inline-block;line-height:1;} .sprite.hit{animation:shake .3s;}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px) rotate(-4deg)}50%{transform:translateX(5px) rotate(3deg)}75%{transform:translateX(-3px)}}
   .sil{filter:brightness(0);} .enc-emoji{font-size:18px;} .enc-emoji.sil{filter:brightness(0);}
-  .mtrack{height:16px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#3a2b2b;position:relative;margin-top:3px;}
+  .mtrack{height:22px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#3a2b2b;position:relative;margin-top:3px;}
   .mghost{position:absolute;inset:0;background:#ffe08a;transition:width .5s ease .2s;} .mfill{position:absolute;inset:0;background:linear-gradient(90deg,#ff5a4d,#c01000);transition:width .15s;}
-  .mhptxt{position:absolute;width:100%;text-align:center;font-size:10px;font-weight:bold;color:#fff;text-shadow:0 1px 2px #000;line-height:16px;z-index:3;}
-  .intent{font-size:15px;margin-top:5px;padding:6px;border:2px dashed var(--warn);border-radius:8px;background:#fff8e8;line-height:1.5;} .intent b{color:var(--red);font-size:17px;}
+  .mhptxt{position:absolute;width:100%;text-align:center;font-size:13px;font-weight:bold;color:#fff;text-shadow:0 1px 2px #000;line-height:22px;z-index:3;}
+  .intent{font-size:16px;margin-top:6px;padding:8px;border:2px dashed var(--warn);border-radius:8px;background:#fff8e8;line-height:1.55;} .intent b{color:var(--red);font-size:20px;}
   .popwrap{position:absolute;left:0;right:0;top:26px;height:0;pointer-events:none;}
   .pop{position:absolute;left:50%;font-weight:bold;font-size:20px;color:#fff;text-shadow:0 2px 3px #000;animation:fly .9s ease-out forwards;}
   .pop.crit{font-size:27px;color:#ffd84d;} .pop.skl{color:#c79bff;} .pop.me{color:#ff8a7a;} .pop.heal{color:#7cf29b;} .pop.miss{color:#9fd0ff;}
   @keyframes fly{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-40px)}}
   .zones{display:flex;flex-direction:column;gap:6px;margin:6px 0;}
   .zone{padding:6px 9px;min-height:62px;transition:background .15s;} .zone.sel{background:#eef5ff;}
-  .ztitle{font-size:15px;font-weight:bold;display:flex;justify-content:space-between;} .zinfo{font-size:12px;color:#555;min-height:14px;}
-  .zdice{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;min-height:40px;}
-  .die{width:40px;height:40px;border-radius:9px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:bold;color:#fff;cursor:grab;user-select:none;touch-action:none;box-shadow:1px 1px 0 rgba(0,0,0,.2);text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .ztitle{font-size:17px;font-weight:bold;display:flex;justify-content:space-between;} .ztitle span:last-child{font-size:19px;} .zinfo{font-size:13px;color:#555;min-height:14px;}
+  .zdice{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;min-height:48px;}
+  .die{width:48px;height:48px;border-radius:10px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:bold;color:#fff;cursor:grab;user-select:none;touch-action:none;box-shadow:1px 1px 0 rgba(0,0,0,.2);text-shadow:0 1px 2px rgba(0,0,0,.4);}
   .hint{font-size:12px;color:#888;text-align:center;margin-top:4px;}
   .log{font-size:11px;margin-top:8px;max-height:72px;overflow:auto;padding:6px 9px;} .log div{margin:1px 0;}
   .toast{position:fixed;left:50%;top:14%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 15px;border-radius:10px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;} .toast.show{opacity:.96;}
@@ -97,7 +97,7 @@
   .versus{display:flex;align-items:flex-start;justify-content:space-around;gap:8px;}
   .fighter{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative;min-width:0;}
   .fighter .mtrack{width:100%;} .vsx{align-self:center;}
-  .fstat{font-size:12px;font-weight:bold;color:#555;} body.dark .fstat{color:#bbb;}
+  .fstat{font-size:14px;font-weight:bold;color:#555;} body.dark .fstat{color:#bbb;}
   .hud{display:flex;gap:6px;margin-bottom:6px;} .hudb{flex:1;font-size:17px;padding:9px 4px;}
   .sframe{position:relative;overflow:visible;}
   .fx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:52px;pointer-events:none;opacity:0;z-index:4;}
@@ -173,8 +173,8 @@
       <div class="zone panel" data-zone="skl"><div class="ztitle"><span id="sklTitle">✨ สกิล</span><span id="sklVal" style="color:#8a4fd0">0</span></div><div class="zinfo" id="sklInfo">วางเต๋าเพื่อใช้สกิล</div><div class="zdice" id="sklDice"></div></div>
       <div class="zone panel" data-zone="tray"><div class="ztitle"><span>🎲 เต๋า</span></div><div class="zdice" id="trayDice"></div></div>
     </div>
-    <div class="row"><button class="primary" id="rollBtn">ทอย 🎲</button><button class="rr" id="rerollBtn" style="display:none">🔄 ทอยใหม่</button><button class="go" id="confirmBtn" disabled>ตีเลย! ⚔️</button></div>
-    <div class="row"><button class="pot" id="potBtn" style="display:none">🧪 ยา HP</button><button class="pot" id="spPotBtn" style="display:none;background:#2f7fd6">🔷 ยา SP</button><button class="cap" id="capBtn" style="display:none">🪤 จับ</button></div>
+    <div class="row"><button class="primary" id="rollBtn">ทอย 🎲</button><button class="go" id="confirmBtn" disabled>ตีเลย! ⚔️</button></div>
+    <div class="row"><button class="pot" id="potBtn" style="display:none">🧪 ยา HP</button><button class="pot" id="spPotBtn" style="display:none;background:#2f7fd6">🔷 ยา SP</button><button class="pot" id="appleBtn" style="display:none;background:#3aa54f">🍎 แอปเปิล</button><button class="cap" id="capBtn" style="display:none">🪤 จับ</button></div>
     <div style="text-align:right;margin-top:2px"><button id="fleeBtn" class="fleemini" style="display:none">🏃 หนี</button></div>
     <div class="hint">ลากเต๋าลงช่อง · กดยืนยันเลย = เต๋าที่เหลือลงช่องโจมตีอัตโนมัติ</div>
     <div class="log panel" id="log"></div>
@@ -204,8 +204,8 @@
 <div class="ovl panel" id="intro">
   <h3>🎲 ยินดีต้อนรับ</h3>
   <p><b>เล่น:</b> ทอย → ลากเต๋าลง ⚔️/🛡️/✨ → ยืนยัน (กดยืนยันเลย = ลงโจมตีอัตโนมัติ)</p>
-  <p>ฆ่ามอน = เงิน+ของ+การ์ด+<b>XP เลเวลอัพ</b> · ฆ่าซ้ำ 10 + ใช้ตาข่าย/เหยื่อ = จับลูกน้อง · ล้มบอส = +ลูกเต๋า</p>
-  <p>⚡ <b>Speed:</b> เร็วกว่ามอน = ฆ่าได้ไม่โดนสวน · ช้ากว่า = โดนสวนแม้ฆ่าได้ · 🔷 <b>SP</b> = พลังสกิล (ใช้สกิลเปลือง เติมได้)</p>
+  <p>ฆ่ามอน = เงิน+ของ+การ์ด+<b>XP เลเวลอัพ</b> · ตีเลือดมอนต่ำ + ใช้ 🪤 ตาข่าย (+🍎เหยื่อ) = จับเป็นลูกน้อง · ล้มบอส = +ลูกเต๋า</p>
+  <p>⚡ <b>Speed:</b> เร็วกว่ามอน = ฆ่าได้ไม่โดนสวน · ช้ากว่า = โดนสวนแม้ฆ่าได้ · 🔷 <b>SP</b> = พลังสกิล</p>
   <p>🎯 ล้ม <b>มังกรเพลิง 🐉</b> ที่ภูเขาไฟ</p>
   <button class="full primary" id="introClose">เริ่มเล่น!</button>
 </div>
@@ -272,7 +272,7 @@ function scorePile(d){const s=d.reduce((a,x)=>a+x.n,0);const p=pokerBonus(d.map(
 const r5=x=>Math.round(x/5)*5;const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 /* ===== BALANCE ===== */
 const BAL={genHP:L=>16+L*4, eliteHP:L=>Math.round((16+L*4)*1.45), bossHP:L=>Math.round((16+L*4)*2.0),
-  genInt:L=>Math.round(3+L*0.8), eliteInt:L=>Math.round((3+L*0.8)*1.45), bossInt:L=>Math.round((3+L*0.8)*1.7),
+  genInt:L=>Math.round(3+L*0.75), eliteInt:L=>Math.round((3+L*0.75)*1.3), bossInt:L=>Math.round((3+L*0.75)*1.5),
   refDmg:[0,10,13,17,23,30], graceBuf:4, estep:3, xpNeed:lv=>4+lv*3, hpPerLv:3,
   tierSpd:{General:4,Elite:7,Boss:6}, baseSpd:5, regenPct:0.04};
 const SKILLS={
@@ -552,19 +552,19 @@ function startTurn(){
   if(C.skillTurn)base=Math.round(base*mul);
   C.intent=base+C.enrage;
   C.dice=[];C.z={atk:[],def:[],skl:[],tray:[]};C.rolled=false;C.reroll=false;C.itemUsed=false;P.sp=Math.min(P.maxsp,(P.sp||0)+1);
-  el("rollBtn").disabled=false;el("rollBtn").style.display="";el("rerollBtn").style.display="none";el("confirmBtn").disabled=true;el("capBtn").style.display="none";renderCombat();
+  el("rollBtn").disabled=false;el("rollBtn").style.display="";el("confirmBtn").disabled=true;el("capBtn").style.display="none";renderCombat();
 }
 function doRoll(){C.dice=[];C.z={atk:[],def:[],skl:[],tray:[]};for(let i=0;i<P.dice;i++){C.dice.push({id:i,n:rand(1,6),c:rand(0,5)});C.z.tray.push(i);}}
 function roll(){if(C.rolled)return;C.rolled=true;doRoll();
   el("rollBtn").disabled=true;el("confirmBtn").disabled=false;
   renderCombat();}
-function reroll(){if(!C.reroll)return;C.reroll=false;doRoll();el("rerollBtn").style.display="none";toast("🔄 ทอยใหม่!");renderCombat();}
 function dieById(id){return C.dice.find(d=>d.id===id);}
 function zoneOf(id){for(const z of["atk","def","skl","tray"])if(C.z[z].includes(id))return z;return"tray";}
 function moveDie(id,z){const c=zoneOf(id);if(c===z)return;C.z[c]=C.z[c].filter(x=>x!==id);C.z[z].push(id);renderCombat();}
 function cycle(id){const o=["tray","atk","def","skl"];moveDie(id,o[(o.indexOf(zoneOf(id))+1)%o.length]);}
 function usePotion(){if(P.potions<=0||!C||C.itemUsed)return;P.potions--;P.hp=Math.min(P.maxhp,P.hp+25);C.itemUsed=true;pop("+25","heal");toast("ใช้ยา HP +25");renderCombat();}
 function useSPpot(){if(!(P.sppots>0)||!C||C.itemUsed)return;P.sppots--;P.sp=Math.min(P.maxsp,P.sp+8);C.itemUsed=true;pop("+8 SP","heal");toast("ใช้ยา SP +8");renderCombat();}
+function useApple(){if(!(P.inv.apple>0)||!C||C.itemUsed)return;P.inv.apple--;P.hp=Math.min(P.maxhp,P.hp+12);C.itemUsed=true;pop("+12","heal");toast("กินแอปเปิล +12 HP");renderCombat();}
 function fxHit(type){const f=el("fx");if(!f)return;f.textContent=({slash:"⚔️",smash:"💥",pierce:"🏹"})[type]||"⚔️";f.className="fx";void f.offsetWidth;f.classList.add(type);}
 function fleeThreshold(){const base=3*P.dice;const diff=C.L-P.lvl;return Math.max(1,Math.round(base+diff*(P.dice*0.5)));}
 function doFlee(){if(!C||!C.rolled)return;const sum=C.dice.reduce((a,d)=>a+d.n,0),need=fleeThreshold();
@@ -574,7 +574,8 @@ function doFlee(){if(!C||!C.rolled)return;const sum=C.dice.reduce((a,d)=>a+d.n,0
   if(P.hp<=0)return playerDie();startTurn();}
 
 function confirm(){
-  if(!C||C.hp<=0)return;
+  if(!C||C.hp<=0||!C.rolled)return;          // ต้องทอยก่อน + กันกดซ้ำรัว ๆ
+  C.rolled=false;el("confirmBtn").disabled=true;
   if(C.z.tray.length){C.z.atk=C.z.atk.concat(C.z.tray);C.z.tray=[];}
   if(C.z.skl.length){const cost=SKILLS[P.skill].sp||0;if(P.sp>=cost){P.sp-=cost;}else{C.z.atk=C.z.atk.concat(C.z.skl);C.z.skl=[];toast("⚠️ SP ไม่พอ — เต๋าสกิลไปลงช่องโจมตีแทน");}}
   const atk=C.z.atk.map(dieById),def=C.z.def.map(dieById),skl=C.z.skl.map(dieById);
@@ -607,12 +608,13 @@ function win(){
   const fitN={weapon:"โจมตี",shield:"เกราะ",armor:"HP/Speed"};
   const pushGear=gid=>{const bias=m.boss?"b":(m.tier==="Elite"?"e":"g");const inst=mkGear(gid,bias);P.bag.push(inst);drops.push({lab:`<span style="color:${RAR[inst.r].c}">${inst.r>0?"["+RAR[inst.r].n+"] ":""}${GEAR[gid].emoji+GEAR[gid].name}</span>`,det:gearStatStr(inst)+" · "+inst.sk.length+" ช่องการ์ด"});};
   const pushCard=cd=>{P.cards.push(cd);drops.push({lab:CARDS[cd].emoji+CARDS[cd].name,det:statStr(CARDS[cd].stat)+" · การ์ด"+fitN[CARDS[cd].fits]});};
-  (m.drops||[]).forEach(d=>{if(Math.random()<d.chance){P.inv[d.k]=(P.inv[d.k]||0)+1;drops.push({lab:ITEM[d.k].emoji+ITEM[d.k].name,det:"ของใช้"});}});
+  (m.drops||[]).forEach(d=>{if(Math.random()<d.chance){P.inv[d.k]=(P.inv[d.k]||0)+1;drops.push({lab:ITEM[d.k].emoji+ITEM[d.k].name,det:d.k==="apple"?"กิน +12 HP หรือใช้เป็นเหยื่อจับ":"ของใช้"});}});
   const elite=m.tier==="Elite";
   if(m.boss){pushGear(z.bossDrop[rand(0,z.bossDrop.length-1)]);pushCard(z.card[rand(0,z.card.length-1)]);}
-  else{const gr=elite?0.9:0.6;if(Math.random()<gr)pushGear(z.gdrops[rand(0,z.gdrops.length-1)]);
-    if(Math.random()<(elite?0.5:0.22))pushCard(z.card[rand(0,z.card.length-1)]);
-    if(elite&&Math.random()<0.6){P.inv.net=(P.inv.net||0)+1;P.nets++;drops.push({lab:"🪤ตาข่าย",det:"+30% โอกาสจับ"});}}
+  else{const gr=elite?0.45:0.25;if(Math.random()<gr)pushGear(z.gdrops[rand(0,z.gdrops.length-1)]);  // ของหายากขึ้น
+    if(Math.random()<(elite?0.3:0.12))pushCard(z.card[rand(0,z.card.length-1)]);
+    if(Math.random()<0.15){P.inv.apple=(P.inv.apple||0)+1;drops.push({lab:"🍎 แอปเปิล",det:"กิน +12 HP หรือใช้เป็นเหยื่อจับ"});}
+    if(Math.random()<(elite?0.45:0.10)){P.inv.net=(P.inv.net||0)+1;P.nets++;drops.push({lab:"🪤 ตาข่ายจับ",det:"ใช้จับมอนตอนเลือดต่ำ"});}}
   log(`💥 ล้ม ${m.name}! +${exp} EXP · +${money(g)}`);
   if(m.final){P.bossDone[EX.zk]=true;recalc();return gameWin();}
   const extra=[];
@@ -632,10 +634,11 @@ function showWinMon(m,exp,g,drops,extra){
 }
 function gameWin(){el("winStat").textContent=`Lv ${P.lvl} · ฆ่า ${P.kills} · ตาย ${P.deaths} · เต๋า ${P.dice} · ลูกน้อง ${P.minions.length}`;el("scrim").style.display="block";el("winov").style.display="block";}
 function tryCapture(){
-  const m=MONS[C.key];let chance=m.boss?0.08:0.30,used="";
-  if(m.likes&&P.inv[m.likes]>0){P.inv[m.likes]--;chance+=.40;used+=` ${ITEM[m.likes].emoji}`;}
-  if(P.nets>0){P.nets--;P.inv.net=Math.max(0,(P.inv.net||0)-1);chance+=.30;used+=" 🪤";}
-  chance=Math.min(m.boss?0.5:0.95,chance);
+  const m=MONS[C.key];if(!(P.nets>0)){toast("ต้องมีไอเทมจับ 🪤 ก่อน");return;}
+  P.nets--;P.inv.net=Math.max(0,(P.inv.net||0)-1);let chance=m.boss?0.12:0.40,used=" 🪤";
+  if(m.likes&&P.inv[m.likes]>0){P.inv[m.likes]--;chance+=.30;used+=` ${ITEM[m.likes].emoji}`;}
+  if((P.research[C.key]||0)>=RESEARCH_NEED){chance+=.20;used+=" 📒";}
+  chance=Math.min(m.boss?0.6:0.95,chance);
   if(Math.random()<chance){P.minions.push(C.key);if(!P.activeMinion)P.activeMinion=C.key;recalc();clearFightTile();
     toast(`🪤 จับ ${m.name} สำเร็จ! ${m.passive.desc}`);log(`🪤 จับ ${m.name} ได้! (${m.passive.desc})`);
     if(m.boss){if(m.final){P.bossDone[EX.zk]=true;return gameWin();}if(!P.bossDone[EX.zk]){P.bossDone[EX.zk]=true;if(P.dice<5){P.dice++;setTimeout(()=>toast(`🎁 +ลูกเต๋า! ${P.dice}`),500);}}}
@@ -657,9 +660,9 @@ function renderCombat(){
   el("pStats").innerHTML=`🗡️${atkTotal()} 🛡️${defTotal()} ⚡${spdTotal()} 🔷${P.sp}/${P.maxsp}`;el("mName2").textContent=m.name;
   el("mStats").innerHTML=`🗡️${C.intent} ⚡${C.spd} 🔥t${C.grace+1}`;
   const toR=Math.max(0,C.grace-C.wt+1);const fast=spdTotal()>=C.spd;
-  const rage=C.enrage?`🔥 เกรี้ยวแล้ว +${C.enrage}`:`🔥 เกรี้ยวในอีก ${toR} เทิร์น`;
+  const rage=C.enrage?`🔥 เกรี้ยว +${C.enrage} dmg (เพิ่ม +${BAL.estep}/เทิร์น)`:`🔥 เกรี้ยวในอีก ${toR} เทิร์น (แล้ว +${BAL.estep} dmg/เทิร์น)`;
   const skLine=C.skillTurn?`<div style="color:#d4380d;font-weight:bold">💥 ${C.sname}! (สกิลมอน ตีแรง)</div>`:(C.mEvery&&((C.wt+1)%C.mEvery===0)?`<div style="color:#d98a00">⚠️ เทิร์นหน้ามอนใช้ ${C.sname}</div>`:"");
-  el("intent").innerHTML=`<div>มอนจะตี <b>${C.intent}</b> · ⚡ ${fast?"เราเร็วกว่า ✓":"มอนเร็วกว่า!"}</div>${skLine}<div style="font-size:13px;color:#a05a00">เทิร์น ${C.wt} · ${rage}</div>`;
+  el("intent").innerHTML=`<div>มอนจะตี <b>${C.intent}</b>${fast?"":' · <span style="color:#c01000;font-weight:bold">⚡ มอนเร็วกว่า!</span>'}</div>${skLine}<div style="font-size:14px;color:#a05a00">เทิร์น ${C.wt} · ${rage}</div>`;
   for(const z of["atk","def","skl","tray"]){const b=el(z+"Dice");b.innerHTML="";C.z[z].forEach(id=>b.appendChild(dieEl(dieById(id))));}
   const atk=C.z.atk.map(dieById),def=C.z.def.map(dieById),skl=C.z.skl.map(dieById);const aS=scorePile(atk),dS=scorePile(def);const cb=colorAtkBonus(atk);
   el("atkDmg").textContent=atk.length?aS.total+atkTotal()+cb:0;
@@ -669,16 +672,17 @@ function renderCombat(){
   el("sklInfo").textContent=skl.length?`${sr.br} = ${sr.dmg}`:sk.desc;
   el("potBtn").style.display=(P.potions>0)?"block":"none";el("potBtn").textContent=`🧪 ยา HP (${P.potions})`;el("potBtn").disabled=!!C.itemUsed;
   el("spPotBtn").style.display=((P.sppots||0)>0)?"block":"none";el("spPotBtn").textContent=`🔷 ยา SP (${P.sppots||0})`;el("spPotBtn").disabled=!!C.itemUsed;
+  el("appleBtn").style.display=((P.inv.apple||0)>0)?"block":"none";el("appleBtn").textContent=`🍎 แอปเปิล (${P.inv.apple||0})`;el("appleBtn").disabled=!!C.itemUsed;
   const lowhp=C.rolled&&C.hp>0&&C.hp<=C.max*0.3;
-  const can=lowhp&&(m.boss?true:(P.research[C.key]||0)>=RESEARCH_NEED);
-  el("capBtn").style.display=can?"block":"none";if(can){let c=m.boss?8:30;if(m.likes&&P.inv[m.likes]>0)c+=40;if(P.nets>0)c+=30;el("capBtn").textContent=`🪤 จับ (${Math.min(m.boss?50:95,c)}%)`;}
+  const can=lowhp&&(P.nets>0);
+  el("capBtn").style.display=can?"block":"none";if(can){let c=m.boss?12:40;if(m.likes&&P.inv[m.likes]>0)c+=30;if((P.research[C.key]||0)>=RESEARCH_NEED)c+=20;el("capBtn").textContent=`🪤 จับ (${Math.min(m.boss?60:95,c)}%)`;}
   el("fleeBtn").style.display=(C.rolled&&!m.final)?"block":"none";if(C.rolled&&!m.final)el("fleeBtn").textContent=`🏃 หนี (ทอย≥${fleeThreshold()})`;
 }
 
 /* ===== DRAG ===== */
 let drag=null;
 function startDrag(ev,id){ev.preventDefault();drag={id,sx:ev.clientX,sy:ev.clientY,moved:false,g:null};window.addEventListener("pointermove",dm);window.addEventListener("pointerup",du);}
-function dm(ev){if(!drag)return;if(!drag.moved&&Math.hypot(ev.clientX-drag.sx,ev.clientY-drag.sy)>6){drag.moved=true;const d=dieById(drag.id);const g=document.createElement("div");g.className="die";g.textContent=d.n;g.style.cssText=`position:fixed;z-index:50;pointer-events:none;width:40px;height:40px;background:var(--c${d.c});opacity:.9`;document.body.appendChild(g);drag.g=g;}
+function dm(ev){if(!drag)return;if(!drag.moved&&Math.hypot(ev.clientX-drag.sx,ev.clientY-drag.sy)>6){drag.moved=true;const d=dieById(drag.id);const g=document.createElement("div");g.className="die";g.textContent=d.n;g.style.cssText=`position:fixed;z-index:50;pointer-events:none;width:48px;height:48px;border-radius:10px;font-size:23px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;background:var(--c${d.c});opacity:.9`;document.body.appendChild(g);drag.g=g;}
   if(drag.moved){drag.g.style.left=(ev.clientX-20)+"px";drag.g.style.top=(ev.clientY-20)+"px";hl();const z=zAt(ev.clientX,ev.clientY);if(z)z.el.classList.add("sel");}}
 function du(ev){window.removeEventListener("pointermove",dm);window.removeEventListener("pointerup",du);if(!drag)return;hl();
   if(drag.moved){if(drag.g)drag.g.remove();const z=zAt(ev.clientX,ev.clientY);if(z)moveDie(drag.id,z.name);}else cycle(drag.id);drag=null;}
@@ -729,7 +733,7 @@ el("hBook").onclick=showBook;el("hSet").onclick=()=>{el("scrim").style.display="
 el("setClose").onclick=closeOvl;
 el("tabChar").onclick=()=>charTab("char");el("tabItems").onclick=()=>charTab("items");el("tabCards").onclick=()=>charTab("cards");
 el("fleeBtn").onclick=doFlee;
-el("rollBtn").onclick=roll; el("rerollBtn").onclick=reroll; el("confirmBtn").onclick=confirm; el("capBtn").onclick=tryCapture; el("potBtn").onclick=usePotion; el("spPotBtn").onclick=useSPpot; el("fleeBtn").onclick=doFlee;
+el("rollBtn").onclick=roll; el("confirmBtn").onclick=confirm; el("capBtn").onclick=tryCapture; el("potBtn").onclick=usePotion; el("spPotBtn").onclick=useSPpot; el("appleBtn").onclick=useApple; el("fleeBtn").onclick=doFlee;
 el("charBack").onclick=()=>{if(backTo==="Explore"){show("Explore");renderExplore();}else if(backTo==="World")showWorld();else showTown();};
 el("shopBack").onclick=showTown;
 el("buyPot").onclick=()=>{if(P.gold>=15){P.gold-=15;P.potions++;toast("ซื้อยา HP แล้ว!");renderShop();}else toast("เงินไม่พอ (15c)");};
@@ -746,7 +750,8 @@ el("helpBtn").onclick=()=>{el("scrim").style.display="block";el("help").style.di
 el("helpClose").onclick=closeOvl; el("encyClose").onclick=closeOvl; el("introClose").onclick=closeOvl; el("fbClose").onclick=closeOvl;
 el("winRestart").onclick=()=>{clearSave();newGame();};
 el("newBtn").onclick=()=>{clearSave();newGame();};
-el("scrim").onclick=()=>{if(el("intro").style.display==="block")return;closeOvl();};
+// ป็อปอัพ modal (ต้องกดปุ่มในนั้นเท่านั้น) — คลิกฉากมืดไม่ปิด กันค้าง/กดพลาด
+el("scrim").onclick=()=>{for(const o of["intro","winmon","winov"])if(el(o).style.display==="block")return;closeOvl();};
 boot();
 </script>
 </body>
